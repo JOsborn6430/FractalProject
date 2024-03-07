@@ -5,13 +5,14 @@ import org.apache.commons.numbers.fraction.BigFraction;
 
 public class Fractal {
     public static void main(String[] args) {
+        System.out.println("hi");
         DrawingPanel panel = new DrawingPanel(500,500);
         Graphics g = panel.getGraphics();
 
-//        panel.setAntiAlias(false);
-//        squareFractal2(250,250,120,6,0,g,panel);
-//        g.setColor(Color.RED);
-//        squareFractal3(250,250,120,6,0,g,panel);
+        panel.setAntiAlias(false);
+        squareFractal2(250,250,120,6,0,g,panel);
+        g.setColor(Color.RED);
+        squareFractal3(250,250,120,6,0,g,panel);
 
 
 
