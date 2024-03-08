@@ -9,11 +9,11 @@ public class Fractal {
         Graphics g = panel.getGraphics();
 
         panel.setAntiAlias(false);
-        squareFractal2(250,250,120,6,0,g,panel);
+        squareFractal2(250,250,120,6,1,g,panel);
         g.setColor(Color.BLUE);
-        squareFractal3(250,250,120,6,0,g,panel);
+        squareFractal3(250,250,120,6,1,g,panel);
         g.setColor(Color.ORANGE);
-        squareFractal3(450,450,12,3,0,g,panel);
+        squareFractal3(450,450,12,3,1,g,panel);
 
 
 
