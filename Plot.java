@@ -1,51 +1,58 @@
+import org.apache.commons.numbers.complex.Complex;
+
 import java.awt.*;
 
 public class Plot {
 
     public DrawingPanel panel;
-    public Graphics g;
 
-    public int[] winSize;
-
-    public double xMax = 10;
-    public double yMax = 10;
-    public int[] center = {0,0};
+    public double w;
+    public double h;
+    public double[] center = {0,0};
     // Plot origin relative to drawing panel origin
 
-    public double xScale = 1;
-    public double yScale = 1;
+    public double scale = 1;
 
-    public Plot(DrawingPanel thePanel, Graphics theGraphics, double maximumX, double maximumY) {
+    public Plot(DrawingPanel thePanel, double[] theCenter, double theScale ) {
         panel = thePanel;
-        g = theGraphics;
-        xMax = maximumX;
-        yMax = maximumY;
-        winSize[0] = panel.getWidth();
-        winSize[1] = panel.getHeight();
+        w = panel.getWidth();
+        h = panel.getHeight();
+        scale = theScale;
+        center[0] = theCenter[0];
+        center[1] = theCenter[1];
 
-        center[0] = Math.ceilDiv(winSize[0],2);
-        center[1] = Math.ceilDiv(winSize[1],2);
-
-        xScale = xMax / Math.floorDiv(winSize[0],2);
     }
 
-    public void plotPoint(double X, double Y, Color color) {
-        int x = (int)Math.round(X);
-        int y = (int)Math.round(Y);
+    public void setCenter(double x, double y) {
+        center[0] = x;
+        center[1] = y;
+    }
 
-        int xP = center[0] + x;
-        int yP = center[1] - y;
-        if (xP < 0 || yP < 0) {
-            System.out.println("Out of panel window");
-        } else {
-            drawPixel(xP, yP, color);
+//    public void plotPoint(double X, double Y, Color color) {
+//        int x = (int)Math.round(X);
+//        int y = (int)Math.round(Y);
+//
+//        int xP = center[0] + x;
+//        int yP = center[1] - y;
+//        if (xP < 0 || yP < 0) {
+//            System.out.println("Out of panel window");
+//        } else {
+//            panel.setPixel(x,y,color);
+//        }
+//
+//    }
+
+
+    public void mandlebrotSet() {
+        panel.clear();
+        for (int i = 0; i < w; i++) {
+            for (int j = 0; j < h; j++) {
+                Complex z = Complex.ofCartesian(i*scale+(center[0]-scale*(w/2)),j*scale+(center[1]-scale*(h/2)));
+                if (Mandle.MandelSetCheck(Mandle.MandelFuncItt(z,z,50))) {
+                    panel.setPixel(i,j,Color.BLACK);
+                } else panel.setPixel(i,j,Color.BLUE);
+            }
         }
-
-    }
-
-    public void drawPixel(int x, int y, Color color) {
-        g.setColor(color);
-        g.drawLine(x,y,x,y);
     }
 
 }

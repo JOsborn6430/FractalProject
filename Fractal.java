@@ -9,11 +9,11 @@ public class Fractal {
         Graphics g = panel.getGraphics();
 
         panel.setAntiAlias(false);
-        squareFractal2(250,250,120,6,1,g,panel);
-        g.setColor(Color.BLUE);
-        squareFractal3(250,250,120,6,1,g,panel);
-        g.setColor(Color.ORANGE);
-        squareFractal3(450,450,12,3,1,g,panel);
+//        squareFractal2(250,250,120,6,1,g,panel);
+//        g.setColor(Color.BLUE);
+//        squareFractal3(250,250,120,6,1,g,panel);
+//        g.setColor(Color.ORANGE);
+//        squareFractal3(450,450,12,3,1,g,panel);
 
 
 
@@ -21,30 +21,10 @@ public class Fractal {
             panel.setPixel(i,100,Color.BLACK);
         }
 
-
+        panel.setPixel(0,0,Color.BLUE);
     }
 
-    public static void MSuperPrecise(ZFrac z, ZFrac c, int max) {
-        ZFrac next = (z.sqr()).add(c);
-        System.out.println(max);
-        if (max > 1) {
-            MSuperPrecise(next, c, max-1);
-        } else {
-            System.out.println(next);
-            System.out.println(next.toDouble());
-        }
-    }
 
-    public static void MandelSetItt(Complex z, Complex c, int max) {
-        Complex next = MF(z,c);
-        if (max > 1 && next.abs() < 2) {
-            MandelSetItt(next,c,max-1);
-        } else System.out.println(next);
-    }
-
-    public static Complex MF(Complex z, Complex c) {
-        return (z.pow(2)).add(c);
-    }
 
     public static void treeFractal(int x, int y, int r, int theta, int steps, Graphics g, DrawingPanel panel, int pause) {
         panel.sleep(pause);
