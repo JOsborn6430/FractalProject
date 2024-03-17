@@ -13,6 +13,11 @@ public class Plot {
 
     public double scale = 1;
 
+    public boolean juliaMode = false;
+    public Complex JC = Complex.ofCartesian(0.2,1);
+
+    public int iterations = 50;
+
     public Plot(DrawingPanel thePanel, double[] theCenter, double theScale ) {
         panel = thePanel;
         w = panel.getWidth();
@@ -28,27 +33,17 @@ public class Plot {
         center[1] = y;
     }
 
-//    public void plotPoint(double X, double Y, Color color) {
-//        int x = (int)Math.round(X);
-//        int y = (int)Math.round(Y);
-//
-//        int xP = center[0] + x;
-//        int yP = center[1] - y;
-//        if (xP < 0 || yP < 0) {
-//            System.out.println("Out of panel window");
-//        } else {
-//            panel.setPixel(x,y,color);
-//        }
-//
-//    }
-
 
     public void mandlebrotSet() {
         panel.clear();
         for (int i = 0; i < w; i++) {
             for (int j = 0; j < h; j++) {
                 Complex z = Complex.ofCartesian(i*scale+(center[0]-scale*(w/2)),j*scale+(center[1]-scale*(h/2)));
-                if (Mandle.MandelSetCheck(Mandle.MandelFuncItt(z,z,50))) {
+                Complex c;
+                if (juliaMode) {
+                    c = JC;
+                } else c = z;
+                if (Mandle.MandelSetCheck(Mandle.MandelFuncItt(z,c,iterations))) {
                     panel.setPixel(i,j,Color.BLACK);
                 } else panel.setPixel(i,j,Color.BLUE);
             }
