@@ -4,9 +4,9 @@
  * Simplified Java drawing window class
  * to accompany Building Java Programs textbook and associated materials
  *
- * authors: Marty Stepp, Stanford University
- *          Stuart Reges, University of Washington
- * version: 4.05, 2016/09/07 (BJP 5th edition)
+ * authors: Stuart Reges, University of Washington
+ *          Marty Stepp
+ * version: 4.07, 2022/04/07 (BJP 5th edition)
  * (make sure to also update version string in Javadoc header below!)
  * =====================================================================
  *
@@ -30,7 +30,6 @@
  */
 
 import javax.imageio.ImageIO;
-import javax.swing.Box;
 import javax.swing.Timer;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -58,10 +57,10 @@ import java.util.*;
  * Building Java Programs textbook and associated materials.
  *
  * <p>
- * Authors: Marty Stepp (Stanford University) and Stuart Reges (University of Washington).
+ * Authors: Stuart Reges (University of Washington) and Marty Stepp.
  *
  * <p>
- * Version: 4.05, 2016/09/07 (to accompany BJP 5th edition).
+ * Version: 4.07, 2022/04/07 (to accompany BJP 5th edition).
  *
  * <p>
  * You can always download the latest {@code DrawingPanel} from
@@ -185,6 +184,9 @@ import java.util.*;
  *
  * <h3>History and recent changes:</h3>
  *
+ * 2022/04/07
+ * - Minor update to remove a security manager-related compiler warning in JDK 17+.
+ *
  * 2016/07/25
  * - Added and cleaned up BJP4 features, static anti-alias settings, bug fixes.
  * <p>
@@ -216,10 +218,10 @@ import java.util.*;
  * - window no longer moves when zoom changes
  * - grid lines
  *
- * @author Marty Stepp, Stanford University, and Stuart Reges, University of Washington
- * @version 4.05, 2016/09/07 (BJP 4th edition)
+ * @author Stuart Reges (University of Washington) and Marty Stepp
+ * @version 4.07, 2022/04/07 (BJP 5th edition)
  */
-public class DrawingPanel implements ImageObserver {
+public final class DrawingPanel implements ImageObserver {
     // class constants
     private static final Color GRID_LINE_COLOR      = new Color(64, 64, 64, 128);   // color of grid lines on panel
     private static final Object LOCK                = new Object();                 // object used for concurrency locking
@@ -230,16 +232,16 @@ public class DrawingPanel implements ImageObserver {
     private static final int MAX_SIZE               = 10000;   // max width/height
     private static final int GRID_LINES_PX_GAP_DEFAULT = 10;   // default px between grid lines
 
-    private static final String VERSION             = "4.05 (2016/09/07)";
+    private static final String VERSION             = "4.07 (2022/04/07)";
     private static final String ABOUT_MESSAGE       = "DrawingPanel\n"
             + "Graphical library class to support Building Java Programs textbook\n"
-            + "written by Marty Stepp, Stanford University\n"
-            + "and Stuart Reges, University of Washington\n\n"
+            + "written by Stuart Reges, University of Washington\n"
+            + "and Marty Stepp\n\n"
             + "Version: " + VERSION + "\n\n"
             + "please visit our web site at:\n"
             + "http://www.buildingjavaprograms.com/";
     private static final String ABOUT_MESSAGE_TITLE = "About DrawingPanel";
-    private static final String COURSE_WEB_SITE     = "http://courses.cs.washington.edu/courses/cse142/CurrentQtr/drawingpanel.txt";
+    private static final String COURSE_WEB_SITE     = "https://courses.cs.washington.edu/courses/cse142/CurrentQtr/drawingpanel.txt";
     private static final String TITLE               = "Drawing Panel";
 
     /** An RGB integer representing alpha at 100% opacity (0xff000000). */
@@ -281,6 +283,7 @@ public class DrawingPanel implements ImageObserver {
 
     /** An internal constant for setting system properties; clients should not use this. */
     public static final String HEADLESS_PROPERTY    = "drawingpanel.headless";
+    private static final String AWT_HEADLESS_PROPERTY = "java.awt.headless";
 
     /** An internal constant for setting system properties; clients should not use this. */
     public static final String MULTIPLE_PROPERTY    = "drawingpanel.multiple";
@@ -501,7 +504,7 @@ public class DrawingPanel implements ImageObserver {
         for (int i = 0; i < threads.length; i++) {
             Thread thread = threads[i];
             String name = String.valueOf(thread.getName()).toLowerCase();
-            if (DEBUG) System.out.println("    DrawingPanel.mainIsActive(): " + thread.getName() + ", priority=" + thread.getPriority() + ", alive=" + thread.isAlive() + ", stack=" + Arrays.toString(thread.getStackTrace()));
+            if (DEBUG) System.out.println("    DrawingPanel.mainIsActive(): " + thread.getName() + ", priority=" + thread.getPriority() + ", alive=" + thread.isAlive() + ", stack=" + java.util.Arrays.toString(thread.getStackTrace()));
             if (name.indexOf("main") >= 0 ||
                     name.indexOf("testrunner-assignmentrunner") >= 0) {
                 // found main thread!
@@ -563,11 +566,13 @@ public class DrawingPanel implements ImageObserver {
                 // (without popping up actual graphical windows on the server's monitor)
                 // creating the buffered image below will prep the classloader so that Image
                 // classes are available later to the JVM
-                System.setProperty("java.awt.headless", "true");
+                System.setProperty(AWT_HEADLESS_PROPERTY, "true");
+                System.setProperty(HEADLESS_PROPERTY, "true");
                 BufferedImage img = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
                 img.getGraphics().drawRect(10, 20, 30, 40);
             } else {
-                System.setProperty("java.awt.headless", "false");
+                System.setProperty(AWT_HEADLESS_PROPERTY, "false");
+                System.setProperty(HEADLESS_PROPERTY, "false");
             }
         }
     }
@@ -888,10 +893,28 @@ public class DrawingPanel implements ImageObserver {
      */
     public void addMouseListener(MouseListener listener) {
         ensureNotNull("listener", listener);
+        panel.addMouseListener(listener);
         if (listener instanceof MouseMotionListener) {
             panel.addMouseMotionListener((MouseMotionListener) listener);
         }
     }
+
+    /**
+     * Adds the given event listener to respond to mouse events on this panel.
+     */
+//    public void addMouseListener(MouseMotionListener listener) {
+//        panel.addMouseMotionListener(listener);
+//        if (listener instanceof MouseListener) {
+//            panel.addMouseListener((MouseListener) listener);
+//        }
+//    }
+
+//    /**
+//     * Adds the given event listener to respond to mouse events on this panel.
+//     */
+//    public void addMouseListener(MouseInputListener listener) {
+//        addMouseListener((MouseListener) listener);
+//    }
 
     /*
      * Whether the panel should automatically switch to animated mode
@@ -1239,7 +1262,11 @@ public class DrawingPanel implements ImageObserver {
      * @return panel's x-coordinate
      */
     public int getX() {
-        return frame.getX();
+        if (isGraphical()) {
+            return frame.getX();
+        } else {
+            return 0;
+        }
     }
 
     /**
@@ -1247,7 +1274,11 @@ public class DrawingPanel implements ImageObserver {
      * @return panel's y-coordinate
      */
     public int getY() {
-        return frame.getY();
+        if (isGraphical()) {
+            return frame.getY();
+        } else {
+            return 0;
+        }
     }
 
     /**
@@ -1287,16 +1318,16 @@ public class DrawingPanel implements ImageObserver {
     private void initializeAnimation() {
         frames = new ArrayList<ImageFrame>();
         encoder = new Gif89Encoder();
-        /*
-        try {
-            if (hasProperty(SAVE_PROPERTY)) {
-                stream = new FileOutputStream(System.getProperty(SAVE_PROPERTY));
-            }
-            // encoder.startEncoding(stream);
-        } catch (IOException e) {
-            System.out.println(e);
-        }
-        */
+		/*
+		try {
+			if (hasProperty(SAVE_PROPERTY)) {
+				stream = new FileOutputStream(System.getProperty(SAVE_PROPERTY));
+			}
+			// encoder.startEncoding(stream);
+		} catch (IOException e) {
+			System.out.println(e);
+		}
+		*/
     }
 
     /*
@@ -1313,7 +1344,7 @@ public class DrawingPanel implements ImageObserver {
      * and automation purposes.
      */
     private boolean isGraphical() {
-        return !hasProperty(SAVE_PROPERTY) && !hasProperty(HEADLESS_PROPERTY);
+        return !hasProperty(SAVE_PROPERTY) && !isHeadless();
     }
 
     /*
@@ -1526,12 +1557,12 @@ public class DrawingPanel implements ImageObserver {
      */
     private boolean readyToClose() {
 /*
-        if (isAnimated()) {
-            // wait a little longer, in case animation is sleeping
-            return System.currentTimeMillis() > createTime + 5 * DELAY;
-        } else {
-            return System.currentTimeMillis() > createTime + 4 * DELAY;
-        }
+		if (isAnimated()) {
+			// wait a little longer, in case animation is sleeping
+			return System.currentTimeMillis() > createTime + 5 * DELAY;
+		} else {
+			return System.currentTimeMillis() > createTime + 4 * DELAY;
+		}
 */
         return (instances == 0 || shouldSave()) && !mainIsActive();
     }
@@ -1600,7 +1631,6 @@ public class DrawingPanel implements ImageObserver {
         // write file
         // (for some reason, NPEs throw sometimes for no reason; just squish them)
         try {
-            // System.out.println("DrawingPanel DEBUG: saving to " + new File(filename).getAbsolutePath());
             ImageIO.write(image2, extension, new File(filename));
         } catch (NullPointerException npe) {
             // empty
@@ -2006,7 +2036,10 @@ public class DrawingPanel implements ImageObserver {
      */
     private void setupMenuBar() {
         // abort compare if we're running as an applet or in a secure environment
-        boolean secure = (System.getSecurityManager() != null);
+        // boolean secure = (System.getSecurityManager() != null);
+
+        // for now, assume non-secure mode since DrawingPanel applet usage is minimal
+        final boolean secure = false;
 
         JMenuItem saveAs = new JMenuItem("Save As...", 'A');
         saveAs.addActionListener(actionListener);

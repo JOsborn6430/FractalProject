@@ -1,4 +1,8 @@
+import org.w3c.dom.ls.LSOutput;
+
+import javax.swing.event.MouseInputListener;
 import java.awt.*;
+import java.awt.event.MouseListener;
 import java.util.Scanner;
 
 public class Main {
@@ -6,10 +10,11 @@ public class Main {
 
         mainUI();
 
+
     }
 
     public static void mainUI() {
-        DrawingPanel panel = new DrawingPanel(701,701);
+        DrawingPanel panel = new DrawingPanel(1000,701);
         Graphics g = panel.getGraphics();
         Scanner scanner = new Scanner(System.in);
         boolean mainLoop = true;
@@ -37,4 +42,15 @@ public class Main {
         }
     }
 
+
+
 }
+
+
+//    DrawingPanel panel = new DrawingPanel(400,400);
+//        panel.onMouseClick(new DrawingPanel.DPMouseEventHandler() {
+//@Override
+//public void onMouseEvent(int x, int y) {
+//        System.out.println(x + " " + y);
+//        }
+//        });

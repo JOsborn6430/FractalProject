@@ -1,4 +1,6 @@
 import org.apache.commons.numbers.complex.Complex;
+
+import java.awt.*;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -10,37 +12,50 @@ public class Mandle {
         Plot p1 = new Plot(panel,cen1,0.01);
         p1.mandlebrotSet();
         boolean run = true;
-        String validCommands = "commands: zoom, cordZoom, home, julia, mandle, iterations, back";
+        String validCommands = "commands: zoomBy, setScale, cordZoom, home, julia, mandle, iterations, back";
         System.out.println(validCommands);
+
+        panel.onMouseClick(new DrawingPanel.DPMouseEventHandler() {
+            @Override
+            public void onMouseEvent(int x, int y) {
+                double cx = x * p1.scale + (p1.center[0] - p1.scale*(p1.w/2));
+                double cy = y * p1.scale + (p1.center[1] - p1.scale*(p1.h/2));
+                p1.setCenter(cx,cy);
+                p1.scale /= p1.scaleBy;
+                Graphics g = panel.getGraphics();
+                g.setColor(Color.RED);
+                p1.mandlebrotSet();
+            }
+        });
+
         while (run) {
             String input = scanner.next();
 
             // I wrote this with if else statements because I thought that switch statements could only be used
             // with primitive types. Turns out it that's mostly true except for Strings and a few others.
 
-            if (input.equals("zoom")) {
-                System.out.println("Enter panel coords and scale factor: x y s");
+            if (input.equals("setScale")) {
+                System.out.println("Enter scale: ");
                 try {
-                    double cx = scanner.nextDouble();
-                    double cy = scanner.nextDouble();
                     double s = scanner.nextDouble();
                     scanner.nextLine();
-
-                    cx = cx * p1.scale + (p1.center[0] - p1.scale*(p1.w/2));
-                    cy = cy * p1.scale + (p1.center[1] - p1.scale*(p1.h/2));
-
-
-                    p1.setCenter(cx,cy);
-//                    p1.mandlebrotSet();
                     p1.scale = s;
-                    p1.mandlebrotSet();
-
-
                 } catch (InputMismatchException IME) {
                     System.out.println("Invalid Input");
                     scanner.nextLine();
                 }
-            } else if (input.equals("home")) {
+            } else if (input.equals("zoomBy")) {
+                System.out.println("Enter zoom: ");
+                try {
+                    double z = scanner.nextDouble();
+                    scanner.nextLine();
+                    p1.scaleBy = z;
+                } catch (InputMismatchException IME) {
+                    System.out.println("Invalid Input");
+                    scanner.nextLine();
+                }
+            }
+            else if (input.equals("home")) {
                 p1.center[0] = 0;
                 p1.center[1] = 0;
                 p1.scale = 0.01;

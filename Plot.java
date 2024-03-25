@@ -12,6 +12,7 @@ public class Plot {
     // Plot origin relative to drawing panel origin
 
     public double scale = 1;
+    public double scaleBy = 2;
 
     public boolean juliaMode = false;
     public Complex JC = Complex.ofCartesian(0.2,1);
